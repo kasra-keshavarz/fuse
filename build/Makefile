@@ -41,12 +41,13 @@ ifeq "$(FC)" "ifort"
 endif
 
 ifeq "$(FC)" "gfortran"
-	NCDF_PATH = ${ISCA_NCDF_PATH_gfort}
-	HDF_PATH  = ${ISCA_HDF_PATH_gfort}
+	NCDF_LIB_PATH = /usr/lib/x86_64-linux-gnu#${NCDF_PATH}
+	HDF_LIB_PATH = /usr/lib/x86_64-linux-gnu/hdf5/serial#${HDF_PATH}
+	INCLUDE_PATH = /usr#${IN_PATH}
 endif
 
-LIBRARIES = -L$(NCDF_PATH)/lib -lnetcdff -lnetcdf -L$(HDF_PATH)/lib -lhdf5_hl -lhdf5
-INCLUDE = -I$(NCDF_PATH)/include -I$(HDF_PATH)/include
+LIBRARIES = -L$(NCDF_LIB_PATH)/lib -lnetcdff -lnetcdf -L$(HDF_LIB_PATH)/lib -lhdf5_hl -lhdf5
+INCLUDE = -I$(INCLUDE_PATH)/include -I$(INCLUDE_PATH)/include
 
 # Define the driver program and associated subroutines for the fidelity test
 FUSE_DRIVER = \

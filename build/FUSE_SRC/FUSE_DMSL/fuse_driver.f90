@@ -61,7 +61,7 @@ USE force_info_module,only:force_info                     ! get forcing info for
 USE get_gforce_module,only:read_ginfo                     ! get dimension lengths from the NetCDF file
 USE get_gforce_module,only:get_varid                      ! get netCDF ID for forcing variables
 USE get_gforce_module,only:get_gforce_3d                  ! get forcing
-USE get_mbands_module,only:get_mbands, GET_MBANDS_INFO    ! get elevation bands for snow modeling
+USE get_mbands_module,only:GET_MBANDS_INFO                ! get elevation bands for snow modeling
 USE get_fparam_module                                     ! get SCE parameters from NetCDF file
 USE GET_TIME_INDICES_MODULE                               ! get time indices
 USE time_io
