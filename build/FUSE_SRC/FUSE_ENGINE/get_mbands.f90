@@ -249,18 +249,17 @@ DO iSpat2=1,nSpat2
 	 Z_FORCING_grid(iSpat1,iSpat2)    = sum(me_TEMP(iSpat1,iSpat2,:)*af_TEMP(iSpat1,iSpat2,:)) ! estimate mean elevation of forcing using weighted mean of EB elevation
 	 elev_mask(iSpat1,iSpat2) = me_TEMP(iSpat1,iSpat2,1) .EQ. NA_VALUE_SP ! if mean elevation first band is NA_VALUE, mask this grid cell
 
-	 if(.NOT.elev_mask(iSpat1,iSpat2)) THEN ! only check area fraction sum to 1 is not NaN
+	 if(.NOT.elev_mask(iSpat1,iSpat2)) THEN ! only check area fraction sum to 1 if not NA_VALUE
 
 		 if (abs(sum(MBANDS_INFO_3d(iSpat1,iSpat2,:)%AF)-1).GT.1E-2) then ! check that area fraction sum to 1
 
 		 	print *, "The area fraction of all the elevation bands do not add up to 1"
-			print *, 'Difference with 1 = ', abs(sum(MBANDS_INFO_3d(iSpat1,iSpat2,:)%AF)-1)
+			!print *, 'Difference with 1 = ', abs(sum(MBANDS_INFO_3d(iSpat1,iSpat2,:)%AF)-1)
+			print *, 'AF', MBANDS_INFO_3d(iSpat1,iSpat2,:)%AF
 			stop
 
 		 end if
 	 end if
-
-	 PRINT *, 'Details elevation bands',MBANDS(JBAND)
 
 	END DO
 END DO

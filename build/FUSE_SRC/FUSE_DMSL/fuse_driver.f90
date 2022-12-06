@@ -80,10 +80,10 @@ IMPLICIT NONE
 ! ---------------------------------------------------------------------------------------
 ! GET COMMAND-LINE ARGUMENTS...
 ! ---------------------------------------------------------------------------------------
-CHARACTER(LEN=64)                      :: DatString          ! string defining forcing data
-CHARACTER(LEN=256)                      :: dom_id             ! ID of the domain
-CHARACTER(LEN=10)                      :: fuse_mode='      ' ! fuse execution mode (run_def, run_best, run_pre, calib_sce)
-CHARACTER(LEN=64)                      :: file_para_list     ! txt file containing list of parameter sets
+CHARACTER(LEN=256)                      :: DatString         ! file manager
+CHARACTER(LEN=256)                      :: dom_id            ! ID of the domain
+CHARACTER(LEN=10)                       :: fuse_mode='      ' ! fuse execution mode (run_def, run_best, run_pre, calib_sce)
+CHARACTER(LEN=256)                      :: file_para_list     ! txt file containing list of parameter sets
 
 ! ---------------------------------------------------------------------------------------
 ! SETUP MODELS FOR SIMULATION -- POPULATE DATA STRUCTURES
