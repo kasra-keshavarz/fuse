@@ -4,7 +4,7 @@ When running FUSE over large (e.g. greater than 10'000 grid cells) domains, we r
 
 `make FC=your_compiler MODE=distributed`
 
-With the current Makefile, replacing `your_compiler` by `ifort` or `fortran` will result in `mpif90` and `mpiifort` being used, respectively (we  have tested both successfully). The resulting executable will be `fuse_mpi.exe`. You will need to specify how many processors (`np`) FUSE can use, the command is system dependent, here is an example for 16 processors - you are likely to need additional arguments for it to run on your system:
+With the current Makefile, replacing `your_compiler` by `ifort` or `gfortran` will result in `mpif90` and `mpiifort` being used, respectively (we  have tested both successfully). The resulting executable will be `fuse_mpi.exe`. You will need to specify how many processors (`np`) FUSE can use, the command is system dependent, here is an example for 16 processors - you are likely to need additional arguments for it to run on your system:
 
 `mpirun -np 16 ./fuse_mpi.exe fm_900_conus_ca_mx_5d.txt maurer_ca_mx_1980_1989 run_def > log_5d.txt`
 
