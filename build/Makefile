@@ -281,9 +281,9 @@ ifeq ($(FC),ifort)
 endif
 
 ifeq ($(FC),gfortran)
-  FFLAGS_NORMA = -O3 -ffree-line-length-none -fmax-errors=0 -cpp -fallow-argument-mismatch
-  FFLAGS_DEBUG = -p -g -Wall -ffree-line-length-none -fmax-errors=0 -fbacktrace -fcheck=bounds -cpp -fallow-argument-mismatch
-  FFLAGS_FIXED = -O2 -c -ffixed-form -fallow-argument-mismatch
+  FFLAGS_NORMA = -O3 -ffree-line-length-none -fmax-errors=0 -cpp
+  FFLAGS_DEBUG = -p -g -Wall -ffree-line-length-none -fmax-errors=0 -fbacktrace -fcheck=bounds -cpp
+  FFLAGS_FIXED = -O2 -c -ffixed-form
 endif
 
 # Default flags
