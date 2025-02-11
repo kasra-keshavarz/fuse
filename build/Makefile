@@ -29,10 +29,9 @@ FC = gfortran
 # find HDF5
 # Check if pkg-config is available for HDF5
 # Check if all required environment variables are set
-ifneq ($(HDF5_PREFIX)$(HDF5_CFLAGS)$(HDF5_LIBS),)
+ifneq ($(HDF5_LIB_DIR)$(HDF5_INCLUDE_DIR),)
   # If all variables are set, proceed
-  HDF5_INCLUDE_DIR = $(HDF5_PREFIX)/include
-  HDF5_LIB_DIR = $(HDF5_PREFIX)/lib
+  :
 else
   # check if the `pkg-config' is available
   HAS_PKG_CONFIG := $(shell pkg-config --exists hdf5 && echo yes)
@@ -41,36 +40,46 @@ else
     HDF5_INCLUDE_DIR := $(shell pkg-config --variable=includedir hdf5)
     HDF5_LIB_DIR := $(shell pkg-config --variable=libdir hdf5)
   else
-    $(error "pkg-config for HDF5 is not available. Set HDF5_INCLUDE_DIR and HDF5_LIB_DIR environment variables manually.")
+    $(error "pkg-config for HDF5 is not available. Set HDF5_INCLUDE_DIR and HDF5_LIB_DIR environment variables manually")
   endif # pkg-config ... hdf5
 endif # HDF5
 
 # netcdf-c
 # Use the nc-config to set the proper flags
 # Check if nc-config is available
-ifneq ($(shell which nc-config 2>/dev/null),)
-  NETCDF_C_CFLAGS := $(shell nc-config --cflags)
-  NETCDF_C_LIBS := $(shell nc-config --libdir)
+ifneq ($(NETCDF_C_PREFIX),)
+    NETCDF_C_INCLUDE := $(NETCDF_C_PREFIX)/include
+    NETCDF_C_LIB := $(NETCDF_C_PREFIX)/lib
 else
-  $(error nc-config not found. Please install netcdf-c library.)
+  ifneq ($(shell which nc-config 2>/dev/null),)
+    NETCDF_C_INCLUDE := $(shell nc-config --includedir)
+    NETCDF_C_LIB := $(shell nc-config --libdir)
+  else
+    $(error nc-config not found. Please install netcdf-c library, or set NETCDF_C_PREFIX manually)
+  endif
 endif
 
 # netcdf-fortran
 # Use the nf-config to set the proper flags
 # Check if nf-config is available
-ifneq ($(shell which nf-config 2>/dev/null),)
-  NETCDF_F_FFLAGS := $(shell nf-config --fflags)
-  NETCDF_F_LIBS := $(shell nf-config --prefix)/lib
+ifneq ($(NETCDF_F_PREFIX),)
+    NETCDF_F_INCLUDE := $(NETCDF_F_PREFIX)/include
+    NETCDF_F_LIB := $(NETCDF_F_PREFIX)/lib
 else
-  $(error nf-config not found. Please install netcdf-fortran library.)
+  ifneq ($(shell which nf-config 2>/dev/null),)
+    NETCDF_F_INCLUDE := $(shell nf-config --includedir)
+    NETCDF_F_LIB := $(shell nf-config --prefix)/lib
+  else
+    $(error nf-config not found. Please install netcdf-fortran library, or set NETCDF_F_PREFIX manually)
+  endif
 endif
 
 # define appropriate flags
-FFLAGS += -I$(HDF5_INCLUDE_DIR) $(NETCDF_C_CFLAGS) $(NETCDF_F_FFLAGS)
-LIBS += -L$(HDF5_LIB_DIR) -lhdf5 -lhdf5_hl -L$(NETCDF_F_LIBS) -lnetcdff -L$(NETCDF_C_LIBS) -lnetcdf
+FFLAGS += -I$(HDF5_INCLUDE_DIR) -I$(NETCDF_C_INCLUDE) -I$(NETCDF_F_INCLUDE)
+LIBS += -L$(HDF5_LIB_DIR) -lhdf5 -lhdf5_hl -L$(NETCDF_F_LIB) -lnetcdff -L$(NETCDF_C_LIB) -lnetcdf
 
-$(info flags are $(FFLAGS))
-$(info libraries are $(LIBS))
+$(info FFLAGS are $(FFLAGS))
+$(info LIBS are $(LIBS))
 
 # Define the driver program and associated subroutines for the fidelity test
 FUSE_DRIVER = \
@@ -303,7 +312,7 @@ endif
 # Compile
 all: compile install clean
 
-# compile FUSE into a static library
+# compile target
 compile: sce_16plus.o
 	$(FC) $(FUSE_ALL) $(DRIVER) \
 	$(LDFLAGS) $(LIBS) $(FFLAGS) -o $(DRIVER_EX)
