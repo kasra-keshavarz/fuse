@@ -293,12 +293,13 @@ FFLAGS = $(FFLAGS_NORMA)
 debug: FFLAGS = $(FFLAGS_DEBUG)
 debug: compile
 
-# special provision for gcc>14
+# Special provision for gcc>14
 ifeq ($(FC),gfortran)
-  GFORTRAN_VERSION := $(shell gfortran --version 2>/dev/null | head -n 1 | rev | cut -d ' ' -f1 | rev | cut -d '.' -f1)
+  GFORTRAN_VERSION := $(shell gfortran -dumpversion | cut -d. -f1)
   $(info compiler version is $(GFORTRAN_VERSION))
-  # Check if the version is greater than 14
-  ifeq ($(shell [ $(GFORTRAN_VERSION) -ge 14 ] && echo true),true)
+  GFORTRAN_GT_14 := $(shell expr $(GFORTRAN_VERSION) \>= 14)
+
+  ifeq ($(GFORTRAN_GT_14),1)
     FFLAGS += -fallow-argument-mismatch
   endif
 endif
