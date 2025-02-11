@@ -50,7 +50,7 @@ endif # HDF5
 # Check if nc-config is available
 ifneq ($(shell which nc-config 2>/dev/null),)
   NETCDF_C_CFLAGS := $(shell nc-config --cflags)
-  NETCDF_C_LIBS := $(shell nc-config --libs)
+  NETCDF_C_LIBS := $(shell nc-config --libdir)
 else
   $(error nc-config not found. Please install netcdf-c library.)
 endif
@@ -60,14 +60,14 @@ endif
 # Check if nf-config is available
 ifneq ($(shell which nf-config 2>/dev/null),)
   NETCDF_F_FFLAGS := $(shell nf-config --fflags)
-  NETCDF_F_LIBS := $(shell nf-config --flibs)
+  NETCDF_F_LIBS := $(shell nf-config --prefix)/lib
 else
   $(error nf-config not found. Please install netcdf-fortran library.)
 endif
 
 # define appropriate flags
 FFLAGS += -I$(HDF5_INCLUDE_DIR) $(NETCDF_C_CFLAGS) $(NETCDF_F_FFLAGS)
-LIBS += -L$(HDF5_LIB_DIR) -lhdf5 -lhdf5_hl $(NETCDF_C_LIBS) $(NETCDF_F_LIBS)
+LIBS += -L$(HDF5_LIB_DIR) -lhdf5 -lhdf5_hl -L$(NETCDF_F_LIBS) -lnetcdff -L$(NETCDF_C_LIBS) -lnetcdf
 
 $(info flags are $(FFLAGS))
 $(info libraries are $(LIBS))
@@ -306,7 +306,7 @@ all: compile install clean
 # compile FUSE into a static library
 compile: sce_16plus.o
 	$(FC) $(FUSE_ALL) $(DRIVER) \
-	$(LDFLAGS) $(FFLAGS) -o $(DRIVER_EX)
+	$(LDFLAGS) $(LIBS) $(FFLAGS) -o $(DRIVER_EX)
 
 # Remove object files
 clean:
