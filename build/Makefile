@@ -75,10 +75,10 @@ else
 endif
 
 # define appropriate flags
-FFLAGS += -I$(HDF5_INCLUDE_DIR) -I$(NETCDF_C_INCLUDE) -I$(NETCDF_F_INCLUDE)
+INCLUDES += -I$(HDF5_INCLUDE_DIR) -I$(NETCDF_C_INCLUDE) -I$(NETCDF_F_INCLUDE)
 LIBS += -L$(HDF5_LIB_DIR) -lhdf5 -lhdf5_hl -L$(NETCDF_F_LIB) -lnetcdff -L$(NETCDF_C_LIB) -lnetcdf
 
-$(info FFLAGS are $(FFLAGS))
+$(info INCLUDES are $(INCLUDES))
 $(info LIBS are $(LIBS))
 
 # Define the driver program and associated subroutines for the fidelity test
@@ -275,23 +275,33 @@ FUSE_ALL = \
 #=====================
 # Define flags based on specified compiler
 ifeq ($(FC),ifort)
-  LDFLAGS_NORMA = -O3 -FR -auto -fltconsistency -fpe0 -fpp
-  LDFLAGS_DEBUG = -O0 -p -g -debug -warn all -check all -FR -auto -WB -traceback -fltconsistency -fpe0 -fpp
-  LDFLAGS_FIXED = -O2 -c -fixed
+  FFLAGS_NORMA = -O3 -FR -auto -fltconsistency -fpe0 -fpp
+  FFLAGS_DEBUG = -O0 -p -g -debug -warn all -check all -FR -auto -WB -traceback -fltconsistency -fpe0 -fpp
+  FFLAGS_FIXED = -O2 -c -fixed
 endif
 
 ifeq ($(FC),gfortran)
-  LDFLAGS_NORMA = -O3 -ffree-line-length-none -fmax-errors=0 -cpp -fallow-argument-mismatch
-  LDFLAGS_DEBUG = -p -g -Wall -ffree-line-length-none -fmax-errors=0 -fbacktrace -fcheck=bounds -cpp -fallow-argument-mismatch
-  LDFLAGS_FIXED = -O2 -c -ffixed-form -fallow-argument-mismatch
+  FFLAGS_NORMA = -O3 -ffree-line-length-none -fmax-errors=0 -cpp -fallow-argument-mismatch
+  FFLAGS_DEBUG = -p -g -Wall -ffree-line-length-none -fmax-errors=0 -fbacktrace -fcheck=bounds -cpp -fallow-argument-mismatch
+  FFLAGS_FIXED = -O2 -c -ffixed-form -fallow-argument-mismatch
 endif
 
 # Default flags
-LDFLAGS = $(LDFLAGS_NORMA)
+FFLAGS = $(FFLAGS_NORMA)
 
 # Target-specific flags for 'debug' target
-debug: LDFLAGS = $(LDFLAGS_DEBUG)
+debug: FFLAGS = $(FFLAGS_DEBUG)
 debug: compile
+
+# special provision for gcc>14
+ifeq ($(FC),gfortran)
+  GFORTRAN_VERSION := $(shell gfortran --version 2>/dev/null | head -n 1 | rev | cut -d ' ' -f1 | rev | cut -d '.' -f1)
+  $(info compiler version is $(GFORTRAN_VERSION))
+  # Check if the version is greater than 14
+  ifeq ($(shell [ $(GFORTRAN_VERSION) -ge 14 ] && echo true),true)
+    FFLAGS += -fallow-argument-mismatch
+  endif
+endif
 
 # MPI: FUSE with MPI has been compiled successfully with mpif90 and mpiifort.
 ifeq "$(MODE)" "distributed"
@@ -315,7 +325,7 @@ all: compile install clean
 # compile target
 compile: sce_16plus.o
 	$(FC) $(FUSE_ALL) $(DRIVER) \
-	$(LDFLAGS) $(LIBS) $(FFLAGS) -o $(DRIVER_EX)
+	$(FFLAGS) $(LIBS) $(INCLUDES) -o $(DRIVER_EX)
 
 # Remove object files
 clean:
@@ -330,6 +340,6 @@ install:
 
 # describe how to compile SCE code written in Fortran 77
 sce_16plus.o: $(SCE_DIR)/sce_16plus.f
-	$(FC) $(LDFLAGS_FIXED) -c $(SCE_DIR)/sce_16plus.f
+	$(FC) $(FFLAGS_FIXED) -c $(SCE_DIR)/sce_16plus.f
 
 .PHONY: debug
