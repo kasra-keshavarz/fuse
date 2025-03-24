@@ -67,8 +67,12 @@ ifneq ($(NETCDF_F_PREFIX),)
     NETCDF_F_LIB := $(NETCDF_F_PREFIX)/lib
 else
   ifneq ($(shell which nf-config 2>/dev/null),)
-    NETCDF_F_INCLUDE := $(shell nf-config --includedir)
-    NETCDF_F_LIB := $(shell nf-config --prefix)/lib
+    # Seems problematic for arm64 macs
+    # NETCDF_F_INCLUDE := $(shell nf-config --includedir)
+    # NETCDF_F_LIB := $(shell nf-config --prefix)/lib
+    # Using pkgconf (pkg-config) for the time being
+    NETCDF_F_INCLUDE := $(shell pkgconf --variable=includedir netcdf-fortran)
+    NETCDF_F_LIB := $(shell pkgconf --variable=libdir netcdf-fortran)
   else
     $(error nf-config not found. Please install netcdf-fortran library, or set NETCDF_F_PREFIX manually)
   endif
